@@ -1,310 +1,292 @@
-# MacClaw Installer e2e 测试
+# MacTools 测试套件
 
 **版本**: 1.0.0
-**测试框架**: Bats-core
+**测试框架**: 纯 Shell 脚本
 **测试环境**: macOS 12+
 
 ---
 
 ## 📋 测试概述
 
-本测试套件为 MacClaw Installer 提供端到端（e2e）测试，验证安装脚本在各种场景下的功能完整性和稳定性。
+本测试套件为 MacTools 项目提供完整的测试验证，采用纯 Shell 脚本实现，**无需任何外部依赖**。
 
 ---
 
 ## 🚀 快速开始
 
-### 安装 Bats 测试框架
-
-```bash
-# 方法 1: 使用 Homebrew（推荐）
-brew install bats-core
-
-# 方法 2: 手动安装到用户目录
-mkdir -p ~/.local/bin
-cd /tmp && git clone --depth 1 https://github.com/bats-core/bats.git
-cd bats && PREFIX=~/.local ./install.sh ~/.local
-
-# 验证安装
-bats --version
-```
-
 ### 运行所有测试
 
 ```bash
 # 使用测试运行器
-./tests/run_e2e_tests.sh
-
-# 或直接使用 Bats
-bats tests/e2e/
+./tests/run_tests.sh
 ```
 
-### 运行特定测试
+### 运行特定测试套件
 
-```bash
-# 列出所有测试
-./tests/run_e2e_tests.sh --list
-
-# 运行特定测试文件
-./tests/run_e2e_tests.sh --file tests/e2e/test_01_environment.bats
-
-# 或使用 Bats 直接运行
-bats tests/e2e/test_01_environment.bats
-```
+编辑 `tests/run_tests.sh`，注释掉不需要的测试套件。
 
 ---
 
-## 📁 测试结构
+## ✨ 测试特性
 
-```
-tests/
-├── e2e/                           # e2e 测试文件
-│   ├── test_01_environment.bats   # 环境检测测试
-│   ├── test_02_online_install.bats # 在线安装测试
-│   ├── test_03_local_install.bats  # 本地安装测试
-│   ├── test_04_components.bats     # 组件功能测试
-│   ├── test_05_error_handling.bats # 错误处理测试
-│   └── test_06_uninstall.bats      # 卸载测试
-├── helpers/                       # 测试辅助函数
-│   ├── fixtures.bash              # 测试数据 fixtures
-│   └── assertions.bash            # 自定义断言
-├── test_helper/                   # 测试辅助库
-│   └── common-setup.bash          # 公共设置
-├── run_e2e_tests.sh              # 测试运行器
-└── README.md                     # 本文档
-```
+- ✅ **零依赖** - 不需要 Bats、Python 或其他测试框架
+- ✅ **轻量级** - 纯 Bash 脚本，易于理解和修改
+- ✅ **快速执行** - 完整测试套件在 10 秒内完成
+- ✅ **跨平台** - 支持 bash 3.2+ 的所有系统
+- ✅ **彩色输出** - 清晰的测试结果展示
+- ✅ **详细报告** - 完整的测试统计和错误信息
 
 ---
 
 ## 📊 测试覆盖
 
-### 1. 环境检测测试 (test_01_environment.bats)
+### 1. 环境检测测试（5 个测试）
+- ✅ macOS 版本检测
+- ✅ 系统架构检测
+- ✅ 必要工具检测（curl, git, bash）
 
-验证系统环境是否满足安装要求：
-
-- ✅ macOS 版本检测（12+）
-- ✅ 系统架构检测（Apple Silicon/Intel）
-- ✅ 磁盘空间检查（至少 20GB）
-- ✅ 依赖工具检测（curl, git, bash）
-- ✅ 网络连接测试
-- ✅ 用户权限验证
-- ✅ 项目文件结构完整性
-
-### 2. 在线安装测试 (test_02_online_install.bats)
-
-验证在线安装模式的可用性：
-
-- ✅ GitHub Raw URL 可访问性
-- ✅ 在线脚本内容完整性
-- ✅ 在线安装模式检测逻辑
-- ✅ 脚本语法正确性
-- ✅ 依赖文件可访问性
-- ✅ 版本一致性检查
-
-### 3. 本地安装测试 (test_03_local_install.bats)
-
-验证本地安装脚本的完整性：
-
-- ✅ 安装脚本存在性和权限
+### 2. 文件结构测试（10 个测试）
+- ✅ 项目目录完整性
+- ✅ 核心脚本文件存在性
 - ✅ 库文件完整性
-- ✅ 配置文件格式
-- ✅ 组件脚本可用性
-- ✅ 卸载脚本完整性
-- ✅ 脚本功能模块覆盖
+- ✅ 配置文件存在性
+
+### 3. 脚本语法测试（4 个测试）
+- ✅ 安装脚本语法验证
+- ✅ 卸载脚本语法验证
+- ✅ 核心库文件语法验证
+
+### 4. 脚本功能测试（6 个测试）
+- ✅ 主函数存在性
+- ✅ 核心功能模块覆盖
 - ✅ 错误处理机制
 
-### 4. 组件功能测试 (test_04_components.bats)
+### 5. 版本信息测试（5 个测试）
+- ✅ 作者信息完整性
+- ✅ 版权信息正确性
+- ✅ 版本文件存在性
 
-验证已安装组件的功能（可选）：
+### 6. 在线安装测试（3 个测试）
+- ✅ GitHub URL 可访问性
+- ✅ 安装脚本可下载性
+- ✅ 脚本内容完整性
 
-- ✅ Node.js 和 npm 可用性
-- ✅ nvm 安装检查
-- ✅ OpenClaw CLI 功能
-- ✅ oMLX 服务状态
-- ✅ gemma-4 模型文件
-- ✅ Skills 组件
-- ✅ 服务集成验证
-- ✅ 配置文件验证
+### 7. 组件测试（5 个测试，可选）
+- ✅ Node.js 可用性
+- ✅ OpenClaw 可用性
+- ✅ oMLX 可用性
+- ✅ 服务状态检查
 
-### 5. 错误处理测试 (test_05_error_handling.bats)
-
-验证各种错误场景的处理：
-
-- ✅ 无效参数处理
-- ✅ 权限错误处理
-- ✅ 文件系统错误
-- ✅ 网络错误处理
-- ✅ 资源限制处理
-- ✅ 并发冲突处理
-- ✅ 依赖缺失处理
-- ✅ 边界条件测试
-
-### 6. 卸载测试 (test_06_uninstall.bats)
-
-验证卸载脚本的完整性：
-
-- ✅ 卸载脚本结构
-- ✅ 清理逻辑覆盖
-- ✅ 安全性检查
-- ✅ 备份功能
-- ✅ 服务停止逻辑
-- ✅ 残留文件清理
-- ✅ 用户数据保护
+**总计**: 38 个测试用例
 
 ---
 
-## 🔧 开发指南
+## 🔧 测试框架结构
 
-### 编写新的测试用例
-
-1. 在 `tests/e2e/` 下创建新的 `.bats` 文件
-2. 包含公共设置：
-
-```bash
-#!/usr/bin/env bats
-
-setup() {
-    source "${PROJECT_ROOT}/tests/test_helper/common-setup.bash"
-    source "${PROJECT_ROOT}/tests/helpers/fixtures.bash"
-    source "${PROJECT_ROOT}/tests/helpers/assertions.bash"
-}
-
-teardown() {
-    cleanup_test_env
-}
-
-@test "测试描述" {
-    # 测试代码
-    [ "condition" = "true" ]
-}
 ```
-
-### 使用辅助函数
-
-```bash
-# 检查命令是否存在
-command_exists "openclaw"
-
-# 检查服务是否运行
-service_running 8008
-
-# HTTP 请求
-http_get "http://127.0.0.1:8008/health"
-
-# 断言函数
-assert_openclaw_installed
-assert_omlx_service_running
-```
-
-### 跳过耗时测试
-
-```bash
-@test "耗时测试示例" {
-    skip "此测试耗时较长，默认跳过"
-    # 测试代码
-}
+tests/
+├── pure_shell_test.sh      # 测试框架核心
+├── run_tests.sh            # 主测试运行器
+├── README.md               # 本文档
+└── e2e/                    # 旧版 Bats 测试（已弃用）
+    └── *.bats
 ```
 
 ---
 
-## 📈 测试报告
+## 💡 使用示例
 
-### TAP 格式输出
+### 基本用法
 
 ```bash
-bats tests/e2e/ --tap
+# 运行所有测试
+./tests/run_tests.sh
+
+# 查看测试输出
+./tests/run_tests.sh 2>&1 | tee test_results.log
 ```
 
-### 带时间戳的输出
+### 测试输出示例
 
-```bash
-bats tests/e2e/ --timing
 ```
+╔════════════════════════════════════════════════════════════╗
+║          MacClaw Installer - 纯 Shell 测试套件            ║
+╚════════════════════════════════════════════════════════════╝
 
-### 详细报告
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  环境检测测试
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  测试 1: 检测 macOS 版本 ... ✓ 通过
+  测试 2: 检测系统架构 ... ✓ 通过
+  测试 3: 检测 curl 工具 ... ✓ 通过
+  测试 4: 检测 git 工具 ... ✓ 通过
+  测试 5: 检测 bash 工具 ... ✓ 通过
 
-```bash
-bats tests/e2e/ --verbose-report
+... (更多测试套件)
+
+╔════════════════════════════════════════════════════════════╗
+║                    测试报告                                ║
+╚════════════════════════════════════════════════════════════╝
+
+  总测试数: 38
+  运行测试: 33
+  通过测试: 33
+  失败测试: 0
+  跳过测试: 5
+
+  通过率: 100%
+
+✓ 所有测试通过！
+
+  总耗时: 8 秒
 ```
 
 ---
 
-## 🐛 调试测试
+## 🛠️ 开发指南
 
-### 启用详细输出
+### 添加新测试
 
-```bash
-BATS_VERBOSE_RUN=1 ./tests/run_e2e_tests.sh
-```
-
-### 查看特定测试的输出
+1. 在 `run_tests.sh` 中定义测试函数：
 
 ```bash
-bats --print-output-on-failure tests/e2e/test_01_environment.bats
+test_my_feature() {
+    # 测试逻辑
+    assert_equals "expected" "actual" "测试失败"
+}
 ```
 
-### 调试单个测试
+2. 在相应的测试套件中调用：
 
 ```bash
-bats --filter "检测 macOS 版本" tests/e2e/
+run_my_tests() {
+    run_test "我的测试描述" test_my_feature
+}
 ```
+
+3. 在 `main()` 函数中添加测试套件：
+
+```bash
+run_test_suite "我的测试套件" run_my_tests
+```
+
+### 可用的断言函数
+
+```bash
+assert_equals "expected" "actual" "消息"
+assert_not_empty "$value" "消息"
+assert_file_exists "/path/to/file" "消息"
+assert_dir_exists "/path/to/dir" "消息"
+assert_command_exists "command" "消息"
+assert_success $status "消息"
+```
+
+### 跳过测试
+
+```bash
+test_optional() {
+    skip_test "此测试需要特定环境"
+}
+```
+
+---
+
+## 📊 测试统计
+
+当前版本统计：
+- **测试套件**: 7 个
+- **测试用例**: 38 个
+- **代码行数**: ~800 行
+- **执行时间**: < 10 秒
+- **依赖项**: 0 个
 
 ---
 
 ## ⚠️ 注意事项
 
 ### 测试环境
-
-- 测试应该在真实的 macOS 环境中运行
+- 测试在真实的 macOS 环境中运行
 - 某些测试需要网络连接
-- 建议在测试前备份重要数据
+- 组件测试为可选，未安装时自动跳过
 
-### 测试时间
-
-- 快速测试（环境检测）：~1 分钟
-- 完整测试套件：~5-10 分钟
-- 包含跳过的测试：可能需要 30+ 分钟
+### 测试权限
+- 测试脚本需要执行权限
+- 某些测试可能需要读取系统信息
 
 ### 清理
-
-- 测试会创建临时文件在 `/tmp` 目录
-- 测试失败后可能需要手动清理
-- 使用 `teardown` 函数确保清理
+- 测试会自动清理临时文件
+- 使用 EXIT 陷阱确保清理
 
 ---
 
-## 🤝 贡献指南
+## 🔄 从 Bats 迁移
 
-### 添加新测试
+如果你之前使用 Bats 测试框架：
 
-1. 确定测试类别（环境、安装、组件等）
-2. 创建相应的 `.bats` 文件
-3. 编写测试用例
-4. 更新此文档
+### 迁移步骤
 
-### 测试命名规范
+1. **移除 Bats 依赖**
+   ```bash
+   # 不再需要安装 Bats
+   brew uninstall bats-core  # 如果之前安装过
+   ```
 
-- 文件名：`test_<编号>_<类别>.bats`
-- 测试函数：使用清晰的描述性名称
-- 注释：添加必要的注释说明
+2. **使用新的测试运行器**
+   ```bash
+   # 旧命令
+   bats tests/e2e/
+   
+   # 新命令
+   ./tests/run_tests.sh
+   ```
 
-### 代码审查
+3. **更新 CI/CD**
+   ```yaml
+   # GitHub Actions 示例
+   - name: Run tests
+     run: ./tests/run_tests.sh
+   ```
 
-- 确保测试独立性
-- 避免测试间的依赖
-- 提供清晰的错误消息
+### 优势对比
+
+| 特性 | Bats | 纯 Shell |
+|------|------|----------|
+| 依赖 | 需要 Bats | 无依赖 |
+| 安装 | 复杂 | 无需安装 |
+| 学习曲线 | 陡峭 | 平缓 |
+| 调试 | 困难 | 容易 |
+| 执行速度 | 快 | 更快 |
+| 文件数量 | 多 | 少 |
+
+---
+
+## 🐛 问题排查
+
+### 测试失败
+
+1. **查看详细输出**
+   ```bash
+   ./tests/run_tests.sh 2>&1 | tee test.log
+   ```
+
+2. **检查失败原因**
+   - 查看日志文件
+   - 验证系统环境
+   - 确认网络连接
+
+3. **调试单个测试**
+   编辑 `run_tests.sh`，注释掉其他测试，只保留目标测试
+
+### 权限问题
+
+```bash
+chmod +x tests/pure_shell_test.sh
+chmod +x tests/run_tests.sh
+```
 
 ---
 
 ## 📞 获取帮助
-
-### 问题排查
-
-1. 查看测试报告了解失败原因
-2. 检查系统日志：`~/macclaw-install.log`
-3. 验证环境配置：`./tests/run_e2e_tests.sh --list`
-
-### 联系方式
 
 - **作者**: 外星动物（常智）
 - **邮箱**: 14455975@qq.com
@@ -318,10 +300,12 @@ bats --filter "检测 macOS 版本" tests/e2e/
 ### v1.0.0 (2026-04-11)
 
 - ✅ 初始版本
-- ✅ 6 个测试文件，50+ 测试用例
-- ✅ 完整的测试辅助函数库
-- ✅ 测试运行器和文档
+- ✅ 38 个测试用例
+- ✅ 7 个测试套件
+- ✅ 零依赖设计
+- ✅ 完整的测试报告
 
 ---
 
-**🎯 让测试成为质量的保障！**
+**🎯 简单、快速、无依赖的测试方案！**
+

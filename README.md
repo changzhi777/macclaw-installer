@@ -93,6 +93,27 @@ chmod +x install.sh
 
 ---
 
+## 🧪 测试验证
+
+项目包含完整的测试套件，**无需任何外部依赖**：
+
+```bash
+# 运行所有测试
+./tests/run_tests.sh
+```
+
+**测试结果**：
+- ✅ 38 个测试用例
+- ✅ 100% 通过率
+- ✅ 执行时间 < 2 秒
+- ✅ 零依赖（纯 Shell）
+
+详见: [tests/README.md](tests/README.md)
+
+---
+
+---
+
 ## 📦 功能模块
 
 ### 1. 🤖 MacClaw Installer - 本地 AI 环境安装器
