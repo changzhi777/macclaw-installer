@@ -22,18 +22,56 @@ if [ ! -d "$SCRIPT_DIR/lib" ]; then
     TEMP_DIR=$(mktemp -d)
     cd "$TEMP_DIR"
 
-    echo "📥 正在克隆项目..."
+    # 方法 1: 尝试使用 git clone（更快）
+    echo "📥 正在克隆项目（方式 1/2）..."
     if command -v git &>/dev/null; then
-        git clone --depth 1 https://github.com/changzhi777/mactools.git temp_repo 2>/dev/null || {
-            echo "⚠️  Git 克隆失败，尝试使用 curl 下载..."
-            curl -fsSL https://github.com/changzhi777/mactools/archive/refs/heads/main.zip -o mactools.zip
-            unzip -q mactools.zip
-            mv mactools-main temp_repo
-        }
+        if git clone --depth 1 https://github.com/changzhi777/mactools.git temp_repo 2>/dev/null; then
+            echo "✅ Git 克隆成功"
+        else
+            echo "⚠️  Git 克隆失败，尝试使用 curl 下载（方式 2/2）..."
+            echo "💡 如果下载失败，请检查："
+            echo "   1. 网络连接是否正常"
+            echo "   2. GitHub 是否可访问"
+            echo "   3. 防火墙是否阻止连接"
+
+            if curl -fsSL https://github.com/changzhi777/mactools/archive/refs/heads/main.zip -o mactools.zip 2>/dev/null; then
+                echo "✅ 下载成功，正在解压..."
+
+                # 检查是否有 unzip 命令
+                if command -v unzip &>/dev/null; then
+                    unzip -q mactools.zip
+                    mv mactools-main temp_repo
+                    echo "✅ 解压成功"
+                else
+                    echo "❌ 错误: 系统缺少 unzip 命令"
+                    echo "💡 请先安装: brew install unzip"
+                    exit 1
+                fi
+            else
+                echo "❌ 下载失败，请检查网络连接或手动下载："
+                echo "   https://github.com/changzhi777/mactools/archive/refs/heads/main.zip"
+                exit 1
+            fi
+        fi
     else
-        curl -fsSL https://github.com/changzhi777/mactools/archive/refs/heads/main.zip -o mactools.zip
-        unzip -q mactools.zip
-        mv mactools-main temp_repo
+        echo "📥 Git 未安装，使用 curl 下载..."
+        if curl -fsSL https://github.com/changzhi777/mactools/archive/refs/heads/main.zip -o mactools.zip 2>/dev/null; then
+            echo "✅ 下载成功，正在解压..."
+
+            if command -v unzip &>/dev/null; then
+                unzip -q mactools.zip
+                mv mactools-main temp_repo
+                echo "✅ 解压成功"
+            else
+                echo "❌ 错误: 系统缺少 unzip 命令"
+                echo "💡 请先安装: brew install unzip"
+                exit 1
+            fi
+        else
+            echo "❌ 下载失败，请检查网络连接或手动下载："
+            echo "   https://github.com/changzhi777/mactools/archive/refs/heads/main.zip"
+            exit 1
+        fi
     fi
 
     SCRIPT_DIR="$TEMP_DIR/temp_repo/macclaw-installer"
