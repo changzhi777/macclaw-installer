@@ -200,6 +200,40 @@ main() {
     # 显示欢迎界面
     show_welcome
 
+    # 基础环境检查（在开始前强制检查）
+    echo ""
+    echo "🔧 基础环境检查..."
+    echo ""
+
+    # 检查 Xcode Command Line Tools
+    log_info "检查 Xcode Command Line Tools..."
+    if ! xcode-select -p &>/dev/null; then
+        log_error "Xcode Command Line Tools 未安装"
+        echo ""
+        echo "❌ Xcode Command Line Tools 未安装"
+        echo ""
+        echo "⚠️  Xcode Command Line Tools 是 macOS 开发的基础工具"
+        echo "⚠️  包含 git、clang、make 等必要工具"
+        echo ""
+        echo "💡 请先安装 Xcode Command Line Tools："
+        echo ""
+        echo "方法 1: 自动安装（推荐）"
+        echo "  xcode-select --install"
+        echo ""
+        echo "方法 2: 手动下载"
+        echo "  https://developer.apple.com/download/more/"
+        echo ""
+        echo "⏳ 安装完成后，请重新运行此脚本"
+        echo ""
+        cleanup_temp
+        exit 1
+    else
+        local version=$(pkgutil --pkg-info=com.apple.pkg.CLTools_Executables 2>/dev/null | grep version | cut -d' ' -f3)
+        log_success "✅ Xcode Command Line Tools 已安装 (版本: $version)"
+    fi
+
+    echo ""
+
     # 环境检测
     show_overall_progress 1 7 "环境检测"
     detect_environment

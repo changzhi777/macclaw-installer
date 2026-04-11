@@ -98,7 +98,20 @@ detect_xcode_tools() {
         log_success "✅ Xcode Command Line Tools 已安装 (版本: $version)"
         return 0
     else
-        log_warning "⚠️  Xcode Command Line Tools 未安装"
+        log_error "❌ Xcode Command Line Tools 未安装"
+        log_error ""
+        log_error "⚠️  Xcode Command Line Tools 是 macOS 开发的基础工具"
+        log_error "⚠️  包含 git、clang、make 等必要工具"
+        log_error ""
+        log_info "💡 请先安装 Xcode Command Line Tools："
+        log_info ""
+        log_info "方法 1: 自动安装（推荐）"
+        log_info "  xcode-select --install"
+        log_info ""
+        log_info "方法 2: 手动下载"
+        log_info "  https://developer.apple.com/download/more/"
+        log_info ""
+        log_warning "⏳ 安装完成后，请重新运行此脚本"
         return 1
     fi
 }
@@ -276,11 +289,20 @@ detect_environment() {
 
     echo ""
 
-    # 开发工具检测
-    detect_xcode_tools || {
-        log_warning "将尝试安装 Xcode Command Line Tools..."
-        install_xcode_tools || ((errors++))
-    }
+    # 开发工具检测（强制要求）
+    log_info "🔧 检查基础开发工具..."
+    if ! detect_xcode_tools; then
+        log_error "❌ 缺少必要的基础工具，无法继续安装"
+        log_info ""
+        log_info "请先安装 Xcode Command Line Tools，然后重新运行此脚本"
+        return 1
+    fi
+
+    # 验证工具可用性
+    if ! verify_xcode_tools; then
+        log_error "❌ 基础工具验证失败"
+        return 1
+    fi
 
     echo ""
 
