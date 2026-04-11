@@ -278,14 +278,15 @@ detect_environment() {
     log_info "🔍 开始环境检测..."
     echo ""
 
-    local errors=0
+    local warnings=0
+    local critical_errors=0
 
     # 基础环境检测
-    detect_macos_version || ((errors++))
-    detect_cpu_arch || ((errors++))
-    detect_memory || ((errors++))
-    detect_disk_space || ((errors++))
-    detect_network || ((errors++))
+    detect_macos_version || ((warnings++))
+    detect_cpu_arch || ((warnings++))
+    detect_memory || ((warnings++))
+    detect_disk_space || ((warnings++))
+    detect_network || ((warnings++))
 
     echo ""
 
@@ -306,28 +307,29 @@ detect_environment() {
 
     echo ""
 
-    # 软件检测
-    detect_python || ((errors++))
-    detect_nodejs
-    detect_npm
-    detect_openclaw
-    detect_omlx
+    # 软件检测（这些是可选的，只记录警告）
+    detect_python || ((warnings++))
+    detect_nodejs || true  # Node.js 会自动安装
+    detect_npm || true     # npm 会随 Node.js 安装
+    detect_openclaw || true
+    detect_omlx || true
 
     echo ""
 
-    # 端口检测
-    detect_port_usage 18789 "OpenClaw Gateway"
-    detect_port_usage 8008 "oMLX"
+    # 端口检测（警告不中断）
+    detect_port_usage 18789 "OpenClaw Gateway" || true
+    detect_port_usage 8008 "oMLX" || true
 
     echo ""
 
-    if [ $errors -eq 0 ]; then
+    # 只报告状态，总是返回成功（除非致命错误）
+    if [ $warnings -eq 0 ]; then
         log_success "✅ 环境检测完成，所有必要条件满足"
-        return 0
     else
-        log_warning "⚠️  环境检测完成，发现 $errors 个问题"
-        return 1
+        log_warning "⚠️  环境检测完成，发现 $warnings 个警告（可继续安装）"
     fi
+
+    return 0
 }
 
 # 导出函数

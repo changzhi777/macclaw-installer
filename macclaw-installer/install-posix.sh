@@ -357,7 +357,7 @@ main() {
     # 环境检测
     echo "🔍 详细环境检测..."
     if command -v detect_environment >/dev/null 2>&1; then
-        detect_environment
+        detect_environment || true  # 环境检测警告不中断安装
     fi
 
     # 配置国内源
