@@ -8,6 +8,24 @@
 
 ---
 
+## 📌 版本信息
+
+**当前版本:** V1.0.1
+
+**版本规则:** V主版本.次版本.修订版本
+- 主版本：重大架构变更
+- 次版本：功能添加或修改
+- 修订版本：Bug修复和小改进（每次推送自动+1）
+
+**快速更新版本号:**
+```bash
+./version.sh --help
+```
+
+详见: [VERSION_MANAGEMENT.md](VERSION_MANAGEMENT.md)
+
+---
+
 ## 📦 项目简介
 
 MacTools 是一个面向 macOS 开发者和 AI 用户的工具集，包含本地 AI 环境一键安装、GitHub SSH 配置、UI/UX 设计资源等多个实用工具。
