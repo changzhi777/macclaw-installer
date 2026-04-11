@@ -236,7 +236,7 @@ main() {
 
     # 环境检测
     show_overall_progress 1 7 "环境检测"
-    detect_environment
+    detect_environment || true  # 环境检测警告不中断安装
     save_state "environment" "completed" 1
 
     # 配置国内源
