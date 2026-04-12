@@ -1,7 +1,7 @@
 # 🎉 MacClaw Installer 发布报告
 
 **发布日期**: 2026-04-12
-**版本**: v1.0.0
+**版本**: v0.1.1
 **仓库**: https://github.com/changzhi777/macclaw-installer
 
 ---
@@ -135,7 +135,7 @@ commit d2aa9d5
 Author: changzhi777 <changzhi777@users.noreply.github.com>
 Date: 2026-04-12
 
-Initial commit: MacClaw Installer v1.0.0
+Initial commit: MacClaw Installer v0.1.1
 ```
 
 ### 标签

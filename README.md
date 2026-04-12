@@ -3,7 +3,7 @@
 **一键安装 OpenClaw + oMLX 本地 AI 环境**
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.1.1-green.svg)](CHANGELOG.md)
 [![macOS](https://img.shields.io/badge/macOS-12%2B-blue.svg)](https://www.apple.com/macos/)
 
 ---
