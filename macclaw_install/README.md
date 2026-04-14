@@ -20,14 +20,13 @@ wget -qO- https://raw.githubusercontent.com/changzhi777/mactools/main/macclaw_in
 ```
 
 **🎯 这一条命令即可完成：**
-- ✅ Homebrew（包管理器）
-- ✅ Node.js 20.x LTS
-- ✅ OpenClaw CLI
-- ✅ oMLX 推理引擎（Apple Silicon）
-- ✅ gemma-4-e4b-it-4bit AI 模型（约 4GB）
-- ✅ 开发者工具、编程助手插件
+- ✅ 系统环境检测
+- ✅ OpenClaw CLI（如果未安装）
+- ✅ 智能组件检测（跳过已安装组件）
+- ✅ AI 推理功能测试
+- ✅ 完整的安装日志
 
-**⏱️ 预计时间：** 15-30 分钟（国内网络）
+**⏱️ 预计时间：** 2-5 分钟（跳过已安装组件）
 
 ---
 
@@ -37,12 +36,12 @@ MacClaw Install 是一个专为 macOS 设计的一键安装工具，用于快速
 
 ### ✨ 核心特性
 
-- 🚀 **一键安装** - 自动安装所有必要组件
+- 🚀 **一键安装** - 非交互式自动安装，无需用户输入
 - 🇨🇳 **国内源优化** - 使用国内镜像源，下载速度更快
-- 🔄 **模块化设计** - 支持4个独立部分，灵活可控
-- 🤖 **AI 算力支持** - 自动配置 oMLX（Apple Silicon）
-- 📦 **插件管理** - 自动安装推荐插件
-- 🗑️ **完整卸载** - 支持完全卸载所有组件
+- 🤖 **智能检测** - 自动检测已安装组件，跳过重复安装
+- 🧪 **功能测试** - 自动测试 AI 推理功能
+- 📊 **详细日志** - 完整的安装日志，方便问题排查
+- 🔧 **简单易用** - 修复了 PATH 问题，使用绝对路径调用命令
 
 ### 🎯 适用场景
 
@@ -66,48 +65,13 @@ MacClaw Install 是一个专为 macOS 设计的一键安装工具，用于快速
 
 ### 手动安装
 
-- **操作系统**: macOS 12 或更高版本（兼容模式支持更低版本）
-- **架构**: Apple Silicon (M1/M2/M3) 或 Intel Mac
-- **内存**: 至少 16GB（推荐 24GB+）
-- **磁盘**: 至少 20GB 可用空间
-
-### 一键安装
-
-```bash
-# 下载并执行
-curl -fsSL https://raw.githubusercontent.com/changzhi777/mactools/main/macclaw_install/install.zsh | zsh
-
-# 或使用 wget
-wget -qO- https://raw.githubusercontent.com/changzhi777/mactools/main/macclaw_install/install.zsh | zsh
-```
-
-### 手动安装
-
 ```bash
 # 克隆仓库
 git clone https://github.com/changzhi777/mactools.git
 cd mactools/macclaw_install
 
 # 运行安装脚本
-chmod +x install.zsh
 ./install.zsh
-```
-
-### 安装模式说明
-
-**交互式安装**（默认）：
-```bash
-./install.zsh
-```
-
-**自动安装**（无交互）：
-```bash
-./install.zsh --auto
-```
-
-**静默安装**（最小输出）：
-```bash
-./install.zsh --silent
 ```
 
 ---
@@ -134,30 +98,13 @@ chmod +x install.zsh
 ```
 macclaw_install/
 ├── README.md                   # 本文件
-├── INSTALL_GUIDE.md            # 详细安装指南
-├── CHANGELOG.md                # 更新日志
-├── install.zsh                 # 主入口脚本
+├── install.zsh                 # 主安装脚本（简化版）
 ├── uninstall.zsh               # 卸载脚本
-├── lib/                        # 核心库
-│   ├── core/
-│   │   ├── logger.zsh          # 日志模块
-│   │   ├── detector.zsh        # 环境检测
-│   │   ├── validator.zsh       # 验证模块
-│   │   └── utils.zsh           # 工具函数
-│   ├── parts/
-│   │   ├── part1_env.zsh       # 第1部分：环境配置
-│   │   ├── part2_compute.zsh   # 第2部分：算力配置
-│   │   ├── part3_openclaw.zsh  # 第3部分：OpenClaw安装
-│   │   └── part4_test_plugins.zsh # 第4部分：测试+插件
-│   └── sources/
-│       ├── homebrew.zsh        # Homebrew 国内源
-│       ├── nodejs.zsh          # Node.js 国内源
-│       └── openclaw.zsh        # OpenClaw 国内源
-├── config/                     # 配置文件
-│   ├── sources.conf            # 镜像源配置
-│   ├── versions.conf           # 版本配置
-│   ├── plugins.conf            # 插件列表
-│   └── compute.conf            # 算力配置
+├── lib/                        # 核心库（保留兼容性）
+│   ├── core/                   # 核心模块
+│   └── parts/                  # 分部模块
+└── config/                     # 配置文件
+```
 ├── scripts/                    # 辅助脚本
 │   ├── detect-compute.zsh      # 算力检测
 │   ├── install-brew.zsh        # Homebrew 安装
@@ -180,17 +127,20 @@ macclaw_install/
 ### OpenClaw 基本命令
 
 ```bash
-# 查看版本
-openclaw --version
-
-# 查看系统信息
-openclaw system info
-
-# 测试推理
+# 测试推理（推荐）
 openclaw infer model run --model omlx/gemma-4-e4b-it-4bit --prompt "你好"
 
-# 查看帮助
+# 运行 Agent 交互
+openclaw agent
+
+# 查看所有命令
 openclaw --help
+
+# 查看模型列表
+openclaw infer model list
+
+# 配置 OpenClaw
+openclaw configure
 ```
 
 ### Agent 管理
@@ -224,37 +174,11 @@ openclaw agents skills attach myagent <skill-name>
 
 ---
 
-## 🔧 高级选项
-
-### 仅安装特定部分
-
-```bash
-./install.zsh
-# 选择 "4) 高级选项"
-# 然后选择要安装的部分
-```
-
-### 自定义配置
-
-编辑配置文件：
-```bash
-# 镜像源配置
-vim config/sources.conf
-
-# 版本配置
-vim config/versions.conf
-
-# 插件列表
-vim config/plugins.conf
-```
-
-### 查看日志
+## 📝 查看日志
 
 ```bash
 # 查看安装日志
-cat ~/macclaw_install.log
-
-# 或在主菜单选择 "5) 查看日志"
+cat ~/macclaw_simple_install.log
 ```
 
 ---
