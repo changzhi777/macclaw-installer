@@ -4,13 +4,13 @@
 # ==============================================================================
 #
 # 功能说明：
-#   - 非交互式安装
+#   - 半交互式安装（oMLX 需要手动安装）
 #   - 自动检测并安装缺失组件
 #   - 修复了原脚本的PATH和交互问题
 #   - 清晰的进度输出
 #
 # 使用方法：
-#   ./install-simple.zsh
+#   ./install.zsh
 #
 # ==============================================================================
 
@@ -248,42 +248,142 @@ install_omlx() {
     fi
 
     log_info "oMLX 是一个 macOS 应用程序，需要手动安装"
-    log_warning "请按以下步骤安装 oMLX："
-    echo ""
-    echo "1. 下载 oMLX（适用于您的系统）："
 
     # 检测 macOS 版本
     local macos_version=$(sw_vers -productVersion)
     local major_version=$(echo "${macos_version}" | cut -d. -f1)
 
+    # 确定 DMG URL
+    local dmg_url=""
+    local dmg_filename=""
+
     if [[ ${major_version} -ge 26 ]]; then
-        echo "   https://github.com/jundot/omlx/releases/download/v0.3.5.dev1/oMLX-0.3.5.dev1-macos26-tahoe.dmg"
+        dmg_url="https://github.com/jundot/omlx/releases/download/v0.3.5.dev1/oMLX-0.3.5.dev1-macos26-tahoe.dmg"
+        dmg_filename="oMLX-0.3.5.dev1-macos26-tahoe.dmg"
     elif [[ ${major_version} -ge 15 ]]; then
-        echo "   https://github.com/jundot/omlx/releases/download/v0.3.5.dev1/oMLX-0.3.5.dev1-macos15-sequoia.dmg"
+        dmg_url="https://github.com/jundot/omlx/releases/download/v0.3.5.dev1/oMLX-0.3.5.dev1-macos15-sequoia.dmg"
+        dmg_filename="oMLX-0.3.5.dev1-macos15-sequoia.dmg"
     else
-        echo "   https://github.com/jundot/omlx/releases"
+        log_warning "不支持的 macOS 版本: ${macos_version}"
+        log_info "请访问 https://github.com/jundot/omlx/releases 下载适合的版本"
+        return 0
     fi
 
     echo ""
-    echo "2. 打开下载的 DMG 文件"
-    echo "3. 将 oMLX.app 拖到 Applications 文件夹"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${CYAN}  oMLX 手动安装向导${NC}"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
-    echo "💡 或者运行以下命令自动下载并打开："
+    echo -e "${WHITE}检测到的 macOS 版本：${NC} ${macos_version}"
+    echo -e "${WHITE}将下载的版本：${NC} ${dmg_filename}"
     echo ""
 
-    if [[ ${major_version} -ge 26 ]]; then
-        echo "   curl -L -o /tmp/oMLX.dmg https://github.com/jundot/omlx/releases/download/v0.3.5.dev1/oMLX-0.3.5.dev1-macos26-tahoe.dmg"
-        echo "   open /tmp/oMLX.dmg"
-    elif [[ ${major_version} -ge 15 ]]; then
-        echo "   curl -L -o /tmp/oMLX.dmg https://github.com/jundot/omlx/releases/download/v0.3.5.dev1/oMLX-0.3.5.dev1-macos15-sequoia.dmg"
-        echo "   open /tmp/oMLX.dmg"
-    fi
-
+    # 询问用户是否自动下载并打开
+    echo -e "${YELLOW}是否自动下载并打开 oMLX 安装包？${NC}"
+    echo "  1) 是 - 自动下载并打开 DMG 文件"
+    echo "  2) 否 - 跳过 oMLX 安装"
+    echo "  3) 重新检测 - 检查是否已安装"
     echo ""
-    log_info "跳过 oMLX 安装，您可以稍后手动安装"
-    log_info "OpenClaw 仍然可以正常使用"
+    echo -n "请选择 [1-3]: "
 
-    return 0
+    read choice
+    echo ""
+
+    case "${choice}" in
+        1|"yes"|"y"|"Y"|"是")
+            log_info "正在下载 oMLX..."
+
+            # 下载 DMG
+            if curl -L -o /tmp/oMLX.dmg "${dmg_url}" 2>&1 | tee -a "${LOG_FILE}"; then
+                log_success "下载完成: /tmp/oMLX.dmg"
+
+                # 显示文件信息
+                local file_size=$(ls -lh /tmp/oMLX.dmg | awk '{print $5}')
+                log_info "文件大小: ${file_size}"
+
+                # 打开 DMG
+                log_info "正在打开安装包..."
+                open /tmp/oMLX.dmg
+
+                echo ""
+                echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+                echo -e "${CYAN}  安装说明${NC}"
+                echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+                echo ""
+                echo -e "${WHITE}📱 安装步骤：${NC}"
+                echo "  1. 在打开的 Finder 窗口中，找到 oMLX.app"
+                echo "  2. 将 oMLX.app 拖拽到 Applications 文件夹"
+                echo "  3. 等待复制完成"
+                echo "  4. 返回此终端，按 Enter 继续"
+                echo ""
+                echo -e "${YELLOW}⏳  脚本已暂停，等待您完成安装...${NC}"
+                echo ""
+
+                # 等待用户确认
+                echo -n "安装完成后，请按 Enter 键继续..."
+                read
+
+                echo ""
+                log_info "检测 oMLX 安装状态..."
+
+                # 检测安装
+                if [[ -d "/Applications/oMLX.app" ]]; then
+                    log_success "✅ oMLX 安装成功！"
+
+                    # 清理 DMG 文件
+                    log_info "清理下载的 DMG 文件..."
+                    rm -f /tmp/oMLX.dmg
+                    log_success "清理完成"
+
+                    return 0
+                else
+                    log_warning "⚠️  未检测到 oMLX 应用"
+                    log_warning "请确认安装步骤是否正确"
+                    log_info "您可以稍后手动安装，OpenClaw 仍可正常使用"
+
+                    # 询问是否重试
+                    echo ""
+                    echo -n "是否重新检测？[y/N]: "
+                    read retry_choice
+                    if [[ "${retry_choice}" =~ ^[yY] ]]; then
+                        install_omlx
+                        return $?
+                    fi
+
+                    return 0
+                fi
+            else
+                log_error "下载失败"
+                log_info "请手动下载: ${dmg_url}"
+                return 1
+            fi
+            ;;
+
+        2|"no"|"n"|"N"|"否")
+            log_info "跳过 oMLX 安装"
+            log_info "您可以稍后手动安装，OpenClaw 仍可正常使用"
+            log_info "下载链接: ${dmg_url}"
+            return 0
+            ;;
+
+        3|"重新检测"|"r"|"R")
+            log_info "重新检测 oMLX 安装状态..."
+            if [[ -d "/Applications/oMLX.app" ]]; then
+                log_success "✅ oMLX 已安装！"
+                return 0
+            else
+                log_warning "⚠️  未检测到 oMLX 应用"
+                log_info "重新开始安装流程..."
+                install_omlx
+                return $?
+            fi
+            ;;
+
+        *)
+            log_warning "无效选择，跳过 oMLX 安装"
+            return 0
+            ;;
+    esac
 }
 
 # ==============================================================================
