@@ -201,37 +201,163 @@ install_nodejs() {
 install_openclaw() {
     log_section "安装 OpenClaw"
 
+    # 检查 OpenClaw 是否已安装
     if check_openclaw; then
-        log_info "OpenClaw 已安装，跳过"
+        log_success "OpenClaw 已安装"
         return 0
     fi
 
-    if ! check_npm; then
-        log_error "npm 未安装，无法安装 OpenClaw"
-        return 1
-    fi
+    log_info "OpenClaw 未安装"
 
-    log_info "开始安装 OpenClaw..."
+    echo ""
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${CYAN}  OpenClaw 安装向导${NC}"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "${WHITE}OpenClaw 是一个本地 AI Agent 框架，支持多种推理引擎。${NC}"
+    echo ""
+    echo -e "${YELLOW}是否需要安装 OpenClaw？${NC}"
+    echo "  1) 是 - 在新终端窗口中安装 OpenClaw"
+    echo "  2) 否 - 跳过 OpenClaw 安装"
+    echo "  3) 重新检测 - 检查是否已安装"
+    echo ""
+    echo -n "请选择 [1-3]: "
 
-    # 使用淘宝镜像
-    local npm_registry="https://registry.npmmirror.com"
+    read choice
+    echo ""
 
-    if npm install -g @iotchange/openclaw-cli --registry="${npm_registry}" 2>&1 | tee -a "${LOG_FILE}"; then
-        log_success "OpenClaw 安装成功"
-    else
-        log_error "OpenClaw 安装失败"
-        return 1
-    fi
+    case "${choice}" in
+        1|"yes"|"y"|"Y"|"是")
+            log_info "准备在新终端窗口中安装 OpenClaw..."
 
-    # 验证安装
-    if command -v openclaw >/dev/null 2>&1; then
-        local version=$(openclaw --version 2>&1 | head -1)
-        log_success "OpenClaw 验证成功: ${version}"
-        return 0
-    else
-        log_error "OpenClaw 安装验证失败"
-        return 1
-    fi
+            echo ""
+            echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            echo -e "${CYAN}  安装说明${NC}"
+            echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            echo ""
+            echo -e "${WHITE}📱 安装步骤：${NC}"
+            echo "  1. 即将打开一个新的终端窗口"
+            echo "  2. 新窗口会自动运行 OpenClaw 安装脚本"
+            echo "  3. 请在新窗口中按照提示完成安装"
+            echo "  4. 安装完成后，返回此终端并按 Enter 继续"
+            echo ""
+            echo -e "${YELLOW}⏳  脚本将在此暂停，等待您完成安装...${NC}"
+            echo ""
+
+            # 等待用户确认
+            echo -n "准备好了吗？按 Enter 开始打开新终端窗口..."
+            read
+
+            log_info "正在打开新的终端窗口..."
+
+            # 使用 osascript 打开新的终端窗口并执行安装命令
+            if [[ -f "/Applications/Utilities/Terminal.app" ]]; then
+                # 使用 macOS Terminal
+                osascript <<EOF
+tell application "Terminal"
+    activate
+    do script "cd /tmp && echo '正在安装 OpenClaw...' && echo '' && echo '安装命令: curl -fsSL https://openclaw.ai/install.sh | bash' && echo '' && echo '安装过程可能需要几分钟，请耐心等待...' && echo '' && curl -fsSL https://openclaw.ai/install.sh | bash && echo '' && echo '✅ OpenClaw 安装完成！' && echo '' && echo '请返回原终端窗口并按 Enter 继续' && echo ''"
+end tell
+EOF
+            elif [[ -f "/Applications/iTerm.app" ]]; then
+                # 使用 iTerm2
+                osascript <<EOF
+tell application "iTerm"
+    activate
+    set newWindow to (create window with default profile)
+    tell current session of newWindow
+        write text "cd /tmp && echo '正在安装 OpenClaw...' && echo '' && echo '安装命令: curl -fsSL https://openclaw.ai/install.sh | bash' && echo '' && echo '安装过程可能需要几分钟，请耐心等待...' && echo '' && curl -fsSL https://openclaw.ai/install.sh | bash && echo '' && echo '✅ OpenClaw 安装完成！' && echo '' && echo '请返回原终端窗口并按 Enter 继续' && echo ''"
+    end tell
+end tell
+EOF
+            else
+                log_error "未找到终端应用程序"
+                log_info "请手动在终端中运行以下命令："
+                echo ""
+                echo "   curl -fsSL https://openclaw.ai/install.sh | bash"
+                echo ""
+                return 1
+            fi
+
+            log_success "新终端窗口已打开"
+            echo ""
+            echo -e "${YELLOW}⏳  等待您在新窗口中完成 OpenClaw 安装...${NC}"
+            echo ""
+
+            # 等待用户确认
+            echo -n "安装完成后，请按 Enter 键继续..."
+            read
+
+            echo ""
+            log_info "检测 OpenClaw 安装状态..."
+
+            # 刷新 PATH
+            export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH}"
+
+            # 重新检测 OpenClaw
+            if command -v openclaw >/dev/null 2>&1; then
+                local version=$(openclaw --version 2>&1 | head -1)
+                log_success "✅ OpenClaw 安装成功！"
+                log_info "版本: ${version}"
+                return 0
+            else
+                log_warning "⚠️  未检测到 OpenClaw 命令"
+                log_warning "请确认安装步骤是否正确"
+
+                # 提供调试信息
+                echo ""
+                echo -e "${YELLOW}💡 调试提示：${NC}"
+                echo "  1. 检查新窗口中的安装是否有错误"
+                echo "  2. 尝试在当前终端中运行: openclaw --version"
+                echo "  3. 如果命令存在，可能是 PATH 问题"
+                echo ""
+
+                # 询问是否重试
+                echo -n "是否重新检测？[y/N]: "
+                read retry_choice
+                if [[ "${retry_choice}" =~ ^[yY] ]]; then
+                    install_openclaw
+                    return $?
+                fi
+
+                return 0
+            fi
+            ;;
+
+        2|"no"|"n"|"N"|"否")
+            log_info "跳过 OpenClaw 安装"
+            log_info "您可以稍后手动安装，或访问 https://openclaw.ai/"
+            echo ""
+            echo "手动安装命令："
+            echo "   curl -fsSL https://openclaw.ai/install.sh | bash"
+            echo ""
+            return 0
+            ;;
+
+        3|"重新检测"|"r"|"R")
+            log_info "重新检测 OpenClaw 安装状态..."
+
+            # 刷新 PATH
+            export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH}"
+
+            if command -v openclaw >/dev/null 2>&1; then
+                local version=$(openclaw --version 2>&1 | head -1)
+                log_success "✅ OpenClaw 已安装！"
+                log_info "版本: ${version}"
+                return 0
+            else
+                log_warning "⚠️  未检测到 OpenClaw"
+                log_info "重新开始安装流程..."
+                install_openclaw
+                return $?
+            fi
+            ;;
+
+        *)
+            log_warning "无效选择，跳过 OpenClaw 安装"
+            return 0
+            ;;
+    esac
 }
 
 # ==============================================================================
