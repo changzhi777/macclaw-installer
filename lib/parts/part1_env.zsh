@@ -73,7 +73,7 @@ install_homebrew() {
     log_info "从官方源下载 Homebrew 安装脚本..."
 
     # 使用错误处理
-    if /bin/bash -c "$(curl -fsSL https://ghproxy.com/https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 2>&1 | tee -a "${LOG_FILE}"; then
+    if /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 2>&1 | tee -a "${LOG_FILE}"; then
         log_success "Homebrew 安装成功"
     else
         local exit_code=$?
