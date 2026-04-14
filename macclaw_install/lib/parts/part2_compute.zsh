@@ -301,63 +301,63 @@ install_omlx() {
     # 使用清华镜像安装
     local pip_index_url="${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}"
 
+    # 尝试安装
     if pip3 install --upgrade omlx -i "${pip_index_url}" 2>&1 | tee -a "${LOG_FILE}"; then
         log_success "oMLX 安装成功"
         OMLX_INSTALLED=true
         return 0
+    fi
+
+    # 安装失败处理
+    local exit_code=$?
+    log_error "oMLX 安装失败（退出码: ${exit_code}）"
+
+    if type throw_error >/dev/null 2>&1; then
+        throw_error ${ERR_OMLX_INSTALL} "oMLX 安装失败" "退出码: ${exit_code}"
     else
-        local exit_code=$?
-        if type throw_error >/dev/null 2>&1; then
-            throw_error ${ERR_OMLX_INSTALL} "oMLX 安装失败" "退出码: ${exit_code}"
-        else
-            log_error "oMLX 安装失败（退出码: ${exit_code}）"
-            increment_error_count
-        fi
+        increment_error_count
+    fi
+
+    # 自动模式：直接返回失败
+    if [[ "${INSTALL_MODE}" == "auto" ]]; then
         return 1
     fi
-        # 安装失败，提供选项
-        log_error "oMLX 安装失败"
 
-        if [[ "${INSTALL_MODE}" == "auto" ]]; then
-            return 1
-        fi
+    # 交互模式：提供选项
+    echo ""
+    local options=(
+        "R" "重试安装"
+        "S" "跳过 oMLX（继续安装 OpenClaw）"
+        "A" "中止安装"
+    )
 
-        # 询问用户
-        echo ""
-        local options=(
-            "R" "重试安装"
-            "S" "跳过 oMLX（继续安装 OpenClaw）"
-            "A" "中止安装"
-        )
+    print_menu "请选择操作" "${options[@]}"
+    read -k1 choice
+    echo ""
 
-        print_menu "请选择操作" "${options[@]}"
-        read -k1 choice
-        echo ""
-
-        case "${choice}" in
-            r|R)
-                log_info "重试安装 oMLX..."
-                if retry_command 3 "pip3 install --upgrade omlx -i ${pip_index_url}" "oMLX 安装失败"; then
-                    OMLX_INSTALLED=true
-                    return 0
-                else
-                    return 1
-                fi
-                ;;
-            s|S)
-                log_warning "跳过 oMLX 安装"
+    case "${choice}" in
+        r|R)
+            log_info "重试安装 oMLX..."
+            if retry_command 3 "pip3 install --upgrade omlx -i ${pip_index_url}" "oMLX 安装失败"; then
+                OMLX_INSTALLED=true
                 return 0
-                ;;
-            a|A)
-                log_error "中止安装"
+            else
                 return 1
-                ;;
-            *)
-                log_error "无效选择，中止安装"
-                return 1
-                ;;
-        esac
-    fi
+            fi
+            ;;
+        s|S)
+            log_warning "跳过 oMLX 安装"
+            return 0
+            ;;
+        a|A)
+            log_error "中止安装"
+            return 1
+            ;;
+        *)
+            log_error "无效选择，中止安装"
+            return 1
+            ;;
+    esac
 }
 
 # ==============================================================================

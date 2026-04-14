@@ -73,7 +73,7 @@ install_homebrew() {
     log_info "从官方源下载 Homebrew 安装脚本..."
 
     # 使用错误处理
-    if /bin/bash -c "$(curl -fsSL https://ghproxy.com/https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 2>&1 | tee -a "${LOG_FILE}"; then
+    if /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 2>&1 | tee -a "${LOG_FILE}"; then
         log_success "Homebrew 安装成功"
     else
         local exit_code=$?
@@ -120,26 +120,51 @@ setup_homebrew_env() {
     # 配置 shell
     if [[ $SHELL == *"zsh"* ]]; then
         # Zsh 配置
+        # 确保 .zprofile 文件存在
+        if [[ ! -f ~/.zprofile ]]; then
+            touch ~/.zprofile 2>/dev/null || {
+                log_error "无法创建 ~/.zprofile 文件"
+                return 1
+            }
+        fi
+
+        # 检查是否已经配置过
         if ! grep -q "eval \"\$(${homebrew_dir}/bin/brew shellenv)\"" ~/.zprofile 2>/dev/null; then
             echo 'eval "$('"${homebrew_dir}"'/bin/brew shellenv)"' >> ~/.zprofile
             log_info "已添加 Homebrew 到 ~/.zprofile"
+        else
+            log_info "Homebrew 已在 ~/.zprofile 中配置"
         fi
     elif [[ $SHELL == *"bash"* ]]; then
         # Bash 配置
+        # 确保 .bash_profile 文件存在
+        if [[ ! -f ~/.bash_profile ]]; then
+            touch ~/.bash_profile 2>/dev/null || {
+                log_error "无法创建 ~/.bash_profile 文件"
+                return 1
+            }
+        fi
+
+        # 检查是否已经配置过
         if ! grep -q "eval \"\$(${homebrew_dir}/bin/brew shellenv)\"" ~/.bash_profile 2>/dev/null; then
             echo 'eval "$('"${homebrew_dir}"'/bin/brew shellenv)"' >> ~/.bash_profile
             log_info "已添加 Homebrew 到 ~/.bash_profile"
+        else
+            log_info "Homebrew 已在 ~/.bash_profile 中配置"
         fi
     fi
 
     # 配置国内镜像
     log_info "配置 Homebrew 国内镜像..."
 
-    # 设置 bottle 镜像
-    if [[ -n "${HOMEBREW_BOTTLE_DOMAIN}" ]]; then
-        export HOMEBREW_BOTTLE_DOMAIN
-        mkdir -p "${HOME}/.zprofile"
-        echo "export HOMEBREW_BOTTLE_DOMAIN=${HOMEBREW_BOTTLE_DOMAIN}" >> ~/.zprofile
+    # 设置 bottle 镜像（仅在 zsh 下）
+    if [[ $SHELL == *"zsh"* ]] && [[ -n "${HOMEBREW_BOTTLE_DOMAIN}" ]]; then
+        if ! grep -q "HOMEBREW_BOTTLE_DOMAIN" ~/.zprofile 2>/dev/null; then
+            echo "export HOMEBREW_BOTTLE_DOMAIN=${HOMEBREW_BOTTLE_DOMAIN}" >> ~/.zprofile
+            log_info "已配置 HOMEBREW_BOTTLE_DOMAIN"
+        else
+            log_info "HOMEBREW_BOTTLE_DOMAIN 已配置"
+        fi
     fi
 
     log_success "Homebrew 环境配置完成"
